@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minecraft|我的世界|首页</title>
-    <meta name="description" content="对Minecraft(我的世界)的信息共享网站。Minecraft是一款由Mojang工作室开发的沙盒游戏，现在是微软旗下游戏。分为两个版本，分别是基岩版和Java版。">
+    <meta name="description"
+        content="对Minecraft(我的世界)的信息共享网站。Minecraft是一款由Mojang工作室开发的沙盒游戏，现在是微软旗下游戏。分为两个版本，分别是基岩版和Java版。">
     <meta name="keywords" content="Minecraft,我的世界,沙盒游戏,Mojang,java，基岩,微软,Microsoft,CQMHV,才倾梦华V,游戏服务器,Game server">
     <meta name="author" content="CQMHV才倾梦华V">
     <meta name="robots" content="index, follow">
@@ -85,6 +87,7 @@
     <script src="/javascript/home.js" defer></script>
 
 </head>
+
 <body>
 
     <header>
@@ -94,7 +97,7 @@
         <nav>
             <div class="menu-toggle" id="menu-toggle">☰</div>
             <div class="menu-backdrop" id="menu-backdrop"></div> <!-- ☰的背景层 -->
-            <ul  id="nav-menu">
+            <ul id="nav-menu">
                 <li><a href="/zh-cn">首页</a></li>
                 <li><a href="/zh-cn/community">社区</a></li>
                 <li><a href="/zh-cn/server">服务器</a></li>
@@ -110,23 +113,30 @@
         <!-- 轮播图横幅 -->
         <section class="carousel">
             <div class="carousel-inner" id="carouselInner">
-                <div class="carousel-item" data-bg="/img/xxx.jpg">
+                <div class="carousel-item" style="background-image:url('/images/carousel/banner1.webp')">
                     <div class="carousel-caption">
                         <h3>探索精彩模组</h3>
                         <p>全新模组分享，支持多个版本</p>
                     </div>
                 </div>
-                <div class="carousel-item" data-bg="/img/xxx.jpg">
+                <div class="carousel-item" style="background-image:url('/images/carousel/banner2.webp')">
                     <div class="carousel-caption">
                         <h3>加入全球服务器</h3>
                         <p>发现属于你的 Minecraft 社区</p>
                     </div>
                 </div>
+                <div class="carousel-item" style="background-image:url('/images/carousel/banner3.webp')">
+                    <div class="carousel-caption">
+                        <h3>加入国际社区</h3>
+                        <p>了解交流和提问 Minecraft</p>
+                    </div>
+                </div>
             </div>
+
             <button id="prevBtn" class="carousel-btn prev">❮</button>
             <button id="nextBtn" class="carousel-btn next">❯</button>
         </section>
-    
+
         <!-- 核心功能介绍 -->
         <section class="features">
             <h3>我们提供什么？</h3>
@@ -145,7 +155,7 @@
                 </div>
             </div>
         </section>
-    
+
         <!-- 分类导航 -->
         <section class="categories">
             <h3>探索内容分类</h3>
@@ -158,25 +168,18 @@
                 <a href="/news" class="category-card">📢 公告</a>
             </div>
         </section>
-    
+
         <!-- 最新分享区 -->
         <section class="latest">
             <h3>最新内容</h3>
-            <ul class="latest-list">
+            <ul class="latest-list" id="news-container">
                 <li>
-                    <a href="/mods/super-pig">🐷 Super Pig 模组</a>
-                    <span class="date">2025-08-06</span>
-                </li>
-                <li>
-                    <a href="/archives/zombie-escape">🧟 僵尸逃脱地图</a>
-                    <span class="date">2025-08-04</span>
-                </li>
-                <li>
-                    <a href="/servers/asia-pvp">⚔️ Asia PvP 服务器</a>
-                    <span class="date">2025-08-03</span>
+                    <span>加载中...</span>
                 </li>
             </ul>
+            <button id="refresh-news">换一批</button>
         </section>
+
     </main>
 
 
@@ -190,7 +193,8 @@
                 <img src="https://cdn.simpleicons.org/github/FFFFFF" alt="GitHub" />
                 <span>GitHub</span>
             </a>
-            <a href="https://www.youtube.com/@CQMHV" class="social-btn youtube" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.youtube.com/@CQMHV" class="social-btn youtube" target="_blank"
+                rel="noopener noreferrer">
                 <img src="https://cdn.simpleicons.org/youtube/FFFFFF" alt="YouTube" />
                 <span>YouTube</span>
             </a>
@@ -202,15 +206,18 @@
                 <img src="https://cdn.simpleicons.org/twitch/FFFFFF" alt="Twitch" />
                 <span>Twitch</span>
             </a>
-            <a href="https://discord.gg/aajRjanwGp" class="social-btn discord" target="_blank" rel="noopener noreferrer">
+            <a href="https://discord.gg/aajRjanwGp" class="social-btn discord" target="_blank"
+                rel="noopener noreferrer">
                 <img src="https://cdn.simpleicons.org/discord/FFFFFF" alt="Discord" />
                 <span>Discord</span>
             </a>
-            <a href="https://www.reddit.com/user/cqmhv/" class="social-btn reddit" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.reddit.com/user/cqmhv/" class="social-btn reddit" target="_blank"
+                rel="noopener noreferrer">
                 <img src="https://cdn.simpleicons.org/reddit/FFFFFF" alt="Reddit" />
                 <span>Reddit</span>
             </a>
-            <a href="https://space.bilibili.com/1041276876?spm_id_from=333.1007.0.0" class="social-btn bilibili" target="_blank" rel="noopener noreferrer">
+            <a href="https://space.bilibili.com/1041276876?spm_id_from=333.1007.0.0" class="social-btn bilibili"
+                target="_blank" rel="noopener noreferrer">
                 <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="Bilibili" />
                 <span>Bilibili</span>
             </a>
@@ -223,4 +230,5 @@
     </footer>
 
 </body>
+
 </html>
