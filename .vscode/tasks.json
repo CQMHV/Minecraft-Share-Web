@@ -1,0 +1,42 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "wrangler-pages-dev",
+            "type": "shell",
+            "command": "npx",
+            "args": [
+                "wrangler",
+                "pages",
+                "dev",
+                "./public",
+                "--port",
+                "8787"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": true,
+            "problemMatcher": [
+                {
+                    "owner": "wrangler",
+                    "fileLocation": ["relative", "${workspaceFolder}"],
+                    "pattern": {
+                        "regexp": "^(.*)$"
+                    },
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": ".*", 
+                        "endsPattern": "http://localhost:8787"
+                    }
+                }
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        }
+    ]
+}

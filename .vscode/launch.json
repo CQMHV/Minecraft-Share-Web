@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Pages (wrangler) + Open Browser",
+            "type": "pwa-chrome",
+            "request": "launch",
+            "url": "http://localhost:8787",
+            "webRoot": "${workspaceFolder}/public",
+            "preLaunchTask": "wrangler-pages-dev",
+            "timeout": 20000,
+            "presentation": {
+                "hidden": false,
+                "group": "wrangler"
+            }
+        }
+    ]
+}

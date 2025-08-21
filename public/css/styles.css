@@ -1,0 +1,228 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+a{
+    text-decoration: none;
+    color:unset;
+}
+}
+h1,h2{
+    position:absolute;
+    left:-9999px;
+}
+
+/* 设置导航栏 */
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #007a08;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+/* 默认横向菜单（桌面端） */
+nav ul {
+    width: 75%;
+    height: 42px;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 5%;
+    background: #008b0a;
+    border-radius: 12px;
+}
+/* 菜单项 */
+nav ul li a {
+    color: #afffb5;
+    font-size: 21px;
+    display: inline-block;
+    padding: 5px 12px;
+    text-decoration: none;
+}
+/* 悬停样式 */
+nav ul li a:hover {
+    color: #5eff69;
+}
+/* 汉堡按钮（默认隐藏） */
+.menu-toggle {
+    display: none;
+    font-size: 32px;
+    color: #afffb5;
+    cursor: pointer;
+    padding: 10px;
+}
+/* 移动端样式 */
+@media (max-width: 768px) {
+    /* 顶部导航栏间距调整 */
+    nav {
+        justify-content: space-between;
+        padding: 0 20px;
+    }
+    /* 汉堡按钮显示 */
+    .menu-toggle {
+        display: block;
+        font-size: 32px;
+        color: #afffb5;
+        cursor: pointer;
+        z-index: 1001; /* 高于菜单与背景 */
+    }
+    /* 背景层（动态高度） */
+    .menu-backdrop {
+        display: none;
+    }
+    .menu-backdrop.show {
+        display: block;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        background-color: #008b0a;
+        z-index: 998;
+        border-radius: 0 0 12px 12px;
+        height: auto; /* 动态设置 via JS */
+    }
+    /* 导航菜单：默认隐藏，展开为纵向 */
+    nav ul {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        display: none;
+        flex-direction: column;
+        z-index: 999;
+        padding: 12px 0;
+        background: transparent; /* 交由 .menu-backdrop 显示背景 */
+    }
+    nav ul.show {
+        display: flex;
+    }
+    nav ul li {
+        width: 100%;
+        text-align: center;
+        margin: 6px 0;
+    }
+    nav ul li a {
+        display: block;
+        width: 100%;
+        padding: 12px 0;
+        font-size: 20px;
+        color: #ffffff;
+        text-decoration: none;
+    }
+    nav ul li a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #5eff69;
+    }
+}
+
+/*设置body背景*/
+body{
+    animation: gradientFlow 15s ease infinite;
+    background: linear-gradient(-45deg, #d6f1e3, #e9f9f2, #c9e9d4, #a4d3b2);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 200% 200%;
+    padding-top: 60px;
+}
+/*设置body背景所需的动画*/
+@keyframes gradientFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+/*设置body背景动画对移动端的优化*/
+@media (max-width: 768px) {
+    body {
+        background-color: lightblue;
+    }
+}
+
+footer{
+    width: 100%;
+    padding:5px;
+    background-color:#007a08;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    color:#e9f9f2;
+    font-size: 16px;
+}
+.language{
+    margin-top:20px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background-color: #1c9149;
+    transition: background 0.2s;
+    font-size: 20px;
+}
+footer p{
+    margin-top: 20px;
+}
+/* 社交媒体按钮样式 */
+.social-grid {
+    display: flex;
+    flex-wrap: wrap;              /* 自动换行 */
+    justify-content: center;      /* 按钮组居中对齐 */
+    gap: 12px;
+    margin-top: 20px;
+}
+.social-btn {
+    width: 80px;
+    height: 80px;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.social-btn img {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 6px;
+    transition: transform 0.2s;
+}
+.social-btn span {
+    font-size: 13px;
+    text-align: center;
+}
+
+/* 品牌背景色 */
+.social-btn.github  { background-color: #181717; }
+.social-btn.youtube { background-color: #FF0000; }
+.social-btn.x       { background-color: #000000; }
+.social-btn.twitch  { background-color: #9146FF; }
+.social-btn.discord { background-color: #5865F2; }
+.social-btn.reddit  { background-color: #FF4500; }
+.social-btn.website { background-color: #007ACC; }
+
+/* 悬浮效果 */
+.social-btn:hover {
+    filter: brightness(1.2);        /* 整体亮一点 */
+}
+.social-btn:hover img {
+    transform: scale(1.1);         /* 图标稍微放大 */
+}
+
+/* 单独为Billbill图标适配 */
+.social-btn.bilibili {
+    background-color: #FA7299;
+}
+.social-btn.bilibili img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}

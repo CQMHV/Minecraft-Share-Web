@@ -1,0 +1,1 @@
+index.js	Pages Functions专用网页语言自动跳转代码
