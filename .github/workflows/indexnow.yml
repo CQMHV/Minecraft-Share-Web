@@ -2,10 +2,12 @@ name: Call IndexNow after deploy
 
 on:
   push:
-    branches: [ main ]           # 改成你的生产分支
+    branches: [ main ]          # 改成你的生产分支
+  workflow_dispatch: {}
 
 env:
   BASE_URL: https://minecraft.cqmhv.com   # 你的站点域名（可改）
+  INDEXNOW_ENDPOINT: /indexnow            # 若路由不同，改成 /api/indexnow 等
 
 jobs:
   call-indexnow:
@@ -14,51 +16,86 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v4
 
-      # 等 300 秒，确保 Cloudflare Pages 已完成发布
+      # 等 300 秒，确保 Cloudflare Pages 完成本次部署（可按需缩短）
       - name: Wait for Cloudflare Pages to finish deployment
         run: sleep 300
 
-      # 自动生成 urlList：扫描 public/ 下的所有 .html
-      # 规则：
-      #  - public/ja-jp/index.html -> https://.../ja-jp/
-      #  - public/zh-cn/community.html -> https://.../zh-cn/community.html
-      - name: Build urls.json from public/
+      # 生成 urls.json：
+      # 1) 优先从 https://<BASE_URL>/sitemap.xml 读取；
+      # 2) 若失败或为空，则回退：扫描仓库的 public/ 下所有 .html
+      - name: Build urls.json (sitemap first, fallback to public/)
         shell: bash
         run: |
           python - <<'PY'
-          import os, json
-          base = os.environ.get('BASE_URL', '').rstrip('/')
-          if not base:
+          import os, json, urllib.request, xml.etree.ElementTree as ET
+
+          BASE = os.environ.get("BASE_URL", "").rstrip("/")
+          if not BASE:
               raise SystemExit("BASE_URL is empty")
-          urls = set()
-          for root, _, files in os.walk('public'):
-              for fn in files:
-                  if not fn.endswith('.html'):
-                      continue
-                  p = os.path.join(root, fn)
-                  rel = os.path.relpath(p, 'public').replace('\\','/')
-                  url = f"{base}/{rel}"
-                  if url.endswith('/index.html'):
-                      url = url[:-len('index.html')]
-                  urls.add(url)
-          data = {"urlList": sorted(urls)[:10000]}  # IndexNow 每次最多 10000 个
-          with open('urls.json','w',encoding='utf-8') as f:
+
+          def from_sitemap():
+              url = f"{BASE}/sitemap.xml"
+              try:
+                  with urllib.request.urlopen(url, timeout=30) as r:
+                      if r.status != 200:
+                          return []
+                      xml = r.read()
+                  root = ET.fromstring(xml)
+                  # 支持标准 sitemap 命名空间
+                  ns = {"sm":"http://www.sitemaps.org/schemas/sitemap/0.9"}
+                  urls = [loc.text.strip() for loc in root.findall(".//sm:url/sm:loc", ns) if loc.text]
+                  # 也支持无命名空间的简单 sitemap
+                  if not urls:
+                      urls = [e.text.strip() for e in root.findall(".//loc") if e.text]
+                  # 只保留属于当前站点的链接
+                  urls = [u for u in urls if u.startswith(BASE)]
+                  return urls
+              except Exception as e:
+                  return []
+
+          def from_public():
+              urls = set()
+              for root, _, files in os.walk("public"):
+                  for fn in files:
+                      if not fn.endswith(".html"):
+                          continue
+                      p = os.path.join(root, fn)
+                      rel = os.path.relpath(p, "public").replace("\\", "/")
+                      url = f"{BASE}/{rel}"
+                      if url.endswith("/index.html"):
+                          url = url[:-len("index.html")]
+                      urls.add(url)
+              return sorted(urls)
+
+          urls = from_sitemap()
+          source = "sitemap.xml"
+          if not urls:
+              urls = from_public()
+              source = "public/"
+
+          data = {"urlList": urls[:10000]}  # IndexNow 单次最多 10000 条
+          with open("urls.json", "w", encoding="utf-8") as f:
               json.dump(data, f, ensure_ascii=False, indent=2)
-          print(f"Built urls.json with {len(data['urlList'])} URLs")
+
+          print(f"Built urls.json with {len(data['urlList'])} URLs from {source}")
           PY
 
-      # 调用你在 Cloudflare Pages Functions 部署的 /indexnow
-      # 若你的路由是 /api/indexnow，请把 URL 改成 https://.../api/indexnow
+      # 调用你部署在 Cloudflare Pages Functions 的 /indexnow
       - name: POST to /indexnow
         run: |
-          curl -sS -X POST "${{ env.BASE_URL }}/indexnow" \
+          set -e
+          RESP=$(curl -sS -X POST "${{ env.BASE_URL }}${{ env.INDEXNOW_ENDPOINT }}" \
             -H "Content-Type: application/json" \
             -H "X-IndexNow-Token: ${{ secrets.INDEXNOW_TOKEN }}" \
-            --data @urls.json
+            --data @urls.json)
+          echo "$RESP" | jq . || echo "$RESP"
 
-      # 可选：输出响应，方便排查
-      - name: Show response (optional)
-        if: always()
+      # 可选：失败时给出排查提示
+      - name: Show tips if failed
+        if: failure()
         run: |
-          echo "If previous step failed, check your function logs via:"
-          echo "  wrangler pages functions tail --project <你的Pages项目名>"
+          echo "提交失败：请检查以下事项："
+          echo "1) GitHub Secrets -> INDEXNOW_TOKEN 是否与 Cloudflare Pages 环境变量一致"
+          echo "2) BASE_URL 与 INDEXNOW_ENDPOINT 是否正确"
+          echo "3) 访问 ${BASE_URL}/indexnow 是否能返回健康检查 JSON"
+          echo "4) Cloudflare Pages Functions 日志（wrangler pages functions tail）"
