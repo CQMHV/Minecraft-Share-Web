@@ -151,13 +151,30 @@ var onRequestGet2 = /* @__PURE__ */ __name(async (ctx) => {
 }, "onRequestGet");
 
 // indexnow.js
-var onRequestPost2 = /* @__PURE__ */ __name(async (ctx) => {
-  const { request, env } = ctx;
+async function onRequestGet3({ env }) {
+  const host = env.HOST || "minecraft.cqmhv.com";
+  const keyLocation = env.INDEXNOW_KEY_LOCATION || `https://${host}/${env.INDEXNOW_KEY || "<missing>"}.txt`;
+  const status = {
+    ok: true,
+    message: "IndexNow endpoint OK",
+    host,
+    // 只返回布尔值，避免泄露敏感内容
+    hasKey: !!env.INDEXNOW_KEY,
+    hasToken: !!env.INDEXNOW_TOKEN,
+    keyLocation
+  };
+  return new Response(JSON.stringify(status, null, 2), {
+    status: 200,
+    headers: { "Content-Type": "application/json; charset=UTF-8" }
+  });
+}
+__name(onRequestGet3, "onRequestGet");
+async function onRequestPost2({ request, env }) {
   const token = request.headers.get("X-IndexNow-Token") || "";
   if (!env.INDEXNOW_TOKEN || token !== env.INDEXNOW_TOKEN) {
     return new Response(JSON.stringify({ error: "unauthorized" }), {
       status: 401,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json; charset=UTF-8" }
     });
   }
   let payload;
@@ -166,7 +183,7 @@ var onRequestPost2 = /* @__PURE__ */ __name(async (ctx) => {
   } catch {
     return new Response(JSON.stringify({ error: "invalid json" }), {
       status: 400,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json; charset=UTF-8" }
     });
   }
   const host = env.HOST || "minecraft.cqmhv.com";
@@ -183,7 +200,7 @@ var onRequestPost2 = /* @__PURE__ */ __name(async (ctx) => {
   if (!key || urlList.length === 0) {
     return new Response(JSON.stringify({ error: "INDEXNOW_KEY or urlList missing" }), {
       status: 400,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json; charset=UTF-8" }
     });
   }
   const res = await fetch("https://api.indexnow.org/indexnow", {
@@ -192,10 +209,16 @@ var onRequestPost2 = /* @__PURE__ */ __name(async (ctx) => {
     body: JSON.stringify({ host, key, keyLocation, urlList })
   });
   const text = await res.text();
-  return new Response(JSON.stringify({ ok: res.ok, status: res.status, body: text }, null, 2), {
-    headers: { "Content-Type": "application/json" }
+  return new Response(JSON.stringify({
+    ok: res.ok,
+    status: res.status,
+    body: text
+  }, null, 2), {
+    status: 200,
+    headers: { "Content-Type": "application/json; charset=UTF-8" }
   });
-}, "onRequestPost");
+}
+__name(onRequestPost2, "onRequestPost");
 
 // index.js
 var SUPPORTED2 = ["zh-cn", "zh-tw", "en-us", "ja-jp", "ko-kr", "fr-fr", "de-de", "es-es", "pt-br", "ru-ru", "ar-sa", "it-it", "hi-in", "id-id"];
@@ -316,6 +339,13 @@ var routes = [
     method: "POST",
     middlewares: [],
     modules: [onRequestPost]
+  },
+  {
+    routePath: "/indexnow",
+    mountPath: "/",
+    method: "GET",
+    middlewares: [],
+    modules: [onRequestGet3]
   },
   {
     routePath: "/indexnow",
@@ -820,7 +850,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// ../.wrangler/tmp/bundle-RBz6L2/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-sHAK5M/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -852,7 +882,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// ../.wrangler/tmp/bundle-RBz6L2/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-sHAK5M/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;

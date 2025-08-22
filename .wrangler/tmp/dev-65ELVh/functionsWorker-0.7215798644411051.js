@@ -152,13 +152,31 @@ var onRequestGet2 = /* @__PURE__ */ __name2(async (ctx) => {
   headers.append("Location", location);
   return new Response(null, { status: 302, headers });
 }, "onRequestGet");
-var onRequestPost2 = /* @__PURE__ */ __name2(async (ctx) => {
-  const { request, env } = ctx;
+async function onRequestGet3({ env }) {
+  const host = env.HOST || "minecraft.cqmhv.com";
+  const keyLocation = env.INDEXNOW_KEY_LOCATION || `https://${host}/${env.INDEXNOW_KEY || "<missing>"}.txt`;
+  const status = {
+    ok: true,
+    message: "IndexNow endpoint OK",
+    host,
+    // 只返回布尔值，避免泄露敏感内容
+    hasKey: !!env.INDEXNOW_KEY,
+    hasToken: !!env.INDEXNOW_TOKEN,
+    keyLocation
+  };
+  return new Response(JSON.stringify(status, null, 2), {
+    status: 200,
+    headers: { "Content-Type": "application/json; charset=UTF-8" }
+  });
+}
+__name(onRequestGet3, "onRequestGet3");
+__name2(onRequestGet3, "onRequestGet");
+async function onRequestPost2({ request, env }) {
   const token = request.headers.get("X-IndexNow-Token") || "";
   if (!env.INDEXNOW_TOKEN || token !== env.INDEXNOW_TOKEN) {
     return new Response(JSON.stringify({ error: "unauthorized" }), {
       status: 401,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json; charset=UTF-8" }
     });
   }
   let payload;
@@ -167,7 +185,7 @@ var onRequestPost2 = /* @__PURE__ */ __name2(async (ctx) => {
   } catch {
     return new Response(JSON.stringify({ error: "invalid json" }), {
       status: 400,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json; charset=UTF-8" }
     });
   }
   const host = env.HOST || "minecraft.cqmhv.com";
@@ -184,7 +202,7 @@ var onRequestPost2 = /* @__PURE__ */ __name2(async (ctx) => {
   if (!key || urlList.length === 0) {
     return new Response(JSON.stringify({ error: "INDEXNOW_KEY or urlList missing" }), {
       status: 400,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json; charset=UTF-8" }
     });
   }
   const res = await fetch("https://api.indexnow.org/indexnow", {
@@ -193,10 +211,17 @@ var onRequestPost2 = /* @__PURE__ */ __name2(async (ctx) => {
     body: JSON.stringify({ host, key, keyLocation, urlList })
   });
   const text = await res.text();
-  return new Response(JSON.stringify({ ok: res.ok, status: res.status, body: text }, null, 2), {
-    headers: { "Content-Type": "application/json" }
+  return new Response(JSON.stringify({
+    ok: res.ok,
+    status: res.status,
+    body: text
+  }, null, 2), {
+    status: 200,
+    headers: { "Content-Type": "application/json; charset=UTF-8" }
   });
-}, "onRequestPost");
+}
+__name(onRequestPost2, "onRequestPost2");
+__name2(onRequestPost2, "onRequestPost");
 var SUPPORTED2 = ["zh-cn", "zh-tw", "en-us", "ja-jp", "ko-kr", "fr-fr", "de-de", "es-es", "pt-br", "ru-ru", "ar-sa", "it-it", "hi-in", "id-id"];
 var LANG_COOKIE = "lang";
 var COUNTRY_FALLBACK = { CN: "zh-cn", TW: "zh-tw", HK: "zh-tw", MO: "zh-tw", JP: "ja-jp", KR: "ko-kr", SG: "zh-cn", MY: "zh-cn", US: "en-us", GB: "en-us", AU: "en-us", CA: "en-us", FR: "fr-fr", DE: "de-de", ES: "es-es", BR: "pt-br", RU: "ru-ru", IT: "it-it", SA: "ar-sa", IN: "hi-in", ID: "id-id" };
@@ -316,6 +341,13 @@ var routes = [
     method: "POST",
     middlewares: [],
     modules: [onRequestPost]
+  },
+  {
+    routePath: "/indexnow",
+    mountPath: "/",
+    method: "GET",
+    middlewares: [],
+    modules: [onRequestGet3]
   },
   {
     routePath: "/indexnow",
