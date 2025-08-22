@@ -85,6 +85,7 @@
     <script src="/javascript/menu-toggle.js" defer></script>
     <script src="/javascript/register-sw.js" defer></script>
     <script src="/javascript/home.js" defer></script>
+    <script src="/javascript/carousel.js" defer></script>
 
 </head>
 
@@ -92,7 +93,7 @@
 
     <header>
 
-        <h1>Minecraft</h1>
+        <h1>Minecraft Share|我的世界分享</h1>
         <h2>我的世界，Mojang开发的一款沙盒游戏，现在是微软旗下游戏。分为两个版本，分别是基岩版和Java版。</h2>
         <nav>
             <div class="menu-toggle" id="menu-toggle">☰</div>
@@ -101,7 +102,7 @@
                 <li><a href="/zh-cn">首页</a></li>
                 <li><a href="/zh-cn/community">社区</a></li>
                 <li><a href="/zh-cn/server">服务器</a></li>
-                <li><a href="/zh-cn/mods">模组</a></li>
+                <li><a href="/zh-cn/resources">资源</a></li>
                 <li><a href="/zh-cn/download">下载</a></li>
                 <li><a href="/zh-cn/more">更多</a></li>
             </ul>
@@ -112,8 +113,8 @@
     <main>
         <!-- 轮播图横幅 -->
         <section class="carousel">
-            <div class="carousel-inner" id="carouselInner">
-                <div class="carousel-item" style="background-image:url('/images/carousel/banner1.webp')">
+            <div class="carousel-inner">
+                <div class="carousel-item  is-active" style="background-image:url('/images/carousel/banner1.webp')">
                     <div class="carousel-caption">
                         <h3>探索精彩模组</h3>
                         <p>全新模组分享，支持多个版本</p>
@@ -132,9 +133,8 @@
                     </div>
                 </div>
             </div>
-
-            <button id="prevBtn" class="carousel-btn prev">❮</button>
-            <button id="nextBtn" class="carousel-btn next">❯</button>
+            <button class="carousel-btn prev">❮</button>
+            <button class="carousel-btn next">❯</button>
         </section>
 
         <!-- 核心功能介绍 -->

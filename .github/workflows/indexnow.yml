@@ -1,0 +1,64 @@
+name: Call IndexNow after deploy
+
+on:
+  push:
+    branches: [ main ]           # 改成你的生产分支
+
+env:
+  BASE_URL: https://minecraft.cqmhv.com   # 你的站点域名（可改）
+
+jobs:
+  call-indexnow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      # 等 300 秒，确保 Cloudflare Pages 已完成发布
+      - name: Wait for Cloudflare Pages to finish deployment
+        run: sleep 300
+
+      # 自动生成 urlList：扫描 public/ 下的所有 .html
+      # 规则：
+      #  - public/ja-jp/index.html -> https://.../ja-jp/
+      #  - public/zh-cn/community.html -> https://.../zh-cn/community.html
+      - name: Build urls.json from public/
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os, json
+          base = os.environ.get('BASE_URL', '').rstrip('/')
+          if not base:
+              raise SystemExit("BASE_URL is empty")
+          urls = set()
+          for root, _, files in os.walk('public'):
+              for fn in files:
+                  if not fn.endswith('.html'):
+                      continue
+                  p = os.path.join(root, fn)
+                  rel = os.path.relpath(p, 'public').replace('\\','/')
+                  url = f"{base}/{rel}"
+                  if url.endswith('/index.html'):
+                      url = url[:-len('index.html')]
+                  urls.add(url)
+          data = {"urlList": sorted(urls)[:10000]}  # IndexNow 每次最多 10000 个
+          with open('urls.json','w',encoding='utf-8') as f:
+              json.dump(data, f, ensure_ascii=False, indent=2)
+          print(f"Built urls.json with {len(data['urlList'])} URLs")
+          PY
+
+      # 调用你在 Cloudflare Pages Functions 部署的 /indexnow
+      # 若你的路由是 /api/indexnow，请把 URL 改成 https://.../api/indexnow
+      - name: POST to /indexnow
+        run: |
+          curl -sS -X POST "${{ env.BASE_URL }}/indexnow" \
+            -H "Content-Type: application/json" \
+            -H "X-IndexNow-Token: ${{ secrets.INDEXNOW_TOKEN }}" \
+            --data @urls.json
+
+      # 可选：输出响应，方便排查
+      - name: Show response (optional)
+        if: always()
+        run: |
+          echo "If previous step failed, check your function logs via:"
+          echo "  wrangler pages functions tail --project <你的Pages项目名>"
