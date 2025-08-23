@@ -2,10 +2,44 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    /* 去掉移动端的点击高亮（iOS/Android） */
+    -webkit-tap-highlight-color: transparent;
+}
+/* 基础交互元素默认不显示边框outline */
+a,
+button,
+input,
+textarea,
+select {
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    background-clip: padding-box;
+}
+/* 亮色模式下的无障碍焦点边框outline样式 */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 2px solid #2684FF; /* Google 常用的蓝色 */
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+/* 深色模式下的无障碍焦点边框outline样式 */
+@media (prefers-color-scheme: dark) {
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible {
+        outline: 2px solid #8AB4F8; /* Google Material 的浅蓝色 */
+    }
+}
+
+
 a{
     text-decoration: none;
     color:unset;
-}
 }
 h1,h2{
     position:absolute;
