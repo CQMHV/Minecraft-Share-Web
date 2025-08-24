@@ -1,67 +1,66 @@
-// 当前缓存版本号，更新时要改名
-const CACHE_NAME = 'mcshare-cache-v8';
-
-// 预缓存的资源（安装阶段一次性写入）
-const PRECACHE_URLS = [
-  '/',            // 首页
-  '/pwa-loading',    // PWA 启动入口（确保离线可用）
-  '/css/styles.css'   // 常用样式文件
+const CACHE_NAME = 'pwa-cache-v1';
+const urlsToCache = [
+  '/pwa-loading', // 只缓存启动页
 ];
 
-// 安装阶段：预缓存资源
+// 安装 Service Worker 时缓存启动页
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE_URLS))
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('Opened cache and caching the PWA loading page');
+        return cache.addAll(urlsToCache);  // 仅缓存 `/pwa-loading`
+      })
   );
-  // 跳过等待，立即启用新 SW
-  self.skipWaiting();
 });
 
-// 激活阶段：清理旧缓存
+// 激活 Service Worker，清理旧缓存
 self.addEventListener('activate', event => {
+  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.map(key => key !== CACHE_NAME && caches.delete(key))
-    ))
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (!cacheWhitelist.includes(cacheName)) {
+            return caches.delete(cacheName); // 删除不再使用的旧缓存
+          }
+        })
+      );
+    })
   );
-  // 立即接管客户端
-  self.clients.claim();
 });
 
-// 请求拦截
+// 拦截网络请求并返回缓存的启动页
 self.addEventListener('fetch', event => {
-  const req = event.request;
-  const url = new URL(req.url);
+  if (event.request.url.includes('/pwa-loading')) {  // 只拦截 pwa-loading 页面请求
+    event.respondWith(
+      caches.match(event.request)
+        .then(cachedResponse => {
+          // 如果缓存中有该页面，返回缓存的资源
+          if (cachedResponse) {
+            return cachedResponse;
+          }
 
-  // 仅处理：同源 + GET 请求
-  if (req.method !== 'GET' || url.origin !== self.location.origin) return;
+          // 如果缓存中没有，进行网络请求
+          return fetch(event.request)
+            .then(response => {
+              // 检查响应是否有效
+              if (!response || response.status !== 200 || response.type !== 'basic') {
+                return response;
+              }
 
-  // API 请求一律直连网络，不缓存
-  if (url.pathname.startsWith('/api/')) {
-    return event.respondWith(fetch(req));
+              // 克隆响应以便缓存
+              const responseToCache = response.clone();
+
+              // 将响应缓存起来
+              caches.open(CACHE_NAME)
+                .then(cache => {
+                  cache.put(event.request, responseToCache);
+                });
+
+              return response;
+            });
+        })
+    );
   }
-
-  const isNavigate = req.mode === 'navigate'; // 页面导航请求
-
-  event.respondWith((async () => {
-    try {
-      // 先查缓存
-      const cached = await caches.match(req);
-      // 同时发起网络请求，若成功则更新缓存
-      const net = fetch(req).then(r => {
-        if (r.ok) caches.open(CACHE_NAME).then(c => c.put(req, r.clone()));
-        return r;
-      });
-      return cached || await net;
-    } catch (err) {
-      // 离线兜底：导航请求返回 /pwa-loading，其他请求返回 503
-      if (isNavigate) {
-        return (await caches.match('/pwa-loading')) || new Response('Offline', { status: 503 });
-      }
-      // 其它请求：若缓存有就返回，否则返回 503
-      const cached = await caches.match(req);
-      return cached || new Response('Offline', { status: 503 });
-    }
-  })());
 });
-
