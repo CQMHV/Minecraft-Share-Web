@@ -1,5 +1,5 @@
 // 当前缓存版本号，更新时要改名
-const CACHE_NAME = 'mcshare-cache-v7';
+const CACHE_NAME = 'mcshare-cache-v8';
 
 // 预缓存的资源（安装阶段一次性写入）
 const PRECACHE_URLS = [
@@ -63,12 +63,5 @@ self.addEventListener('fetch', event => {
       return cached || new Response('Offline', { status: 503 });
     }
   })());
-});
-
-// 配合register-sw.js自动激活sw
-self.addEventListener('message', (e) => {
-  if (e.data && e.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
 });
 
