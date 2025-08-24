@@ -11,10 +11,8 @@
       const reg = await navigator.serviceWorker.register(SW_URL, { scope: SCOPE });
       await navigator.serviceWorker.ready;  // 等待 SW 准备好
       console.log('Service Worker ready.');
-      location.replace('/');  // 等待 SW 注册成功后跳转首页
     } catch (e) {
       console.error('Service Worker 注册失败', e);
-      location.replace('/');  // 注册失败也跳转
     }
   };
 
