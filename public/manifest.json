@@ -1,8 +1,8 @@
 {
   "name": "Minecraft Share",
   "short_name": "MCshare",
-  "id": "/pwa-lang?source=pwa",
-  "start_url": "/pwa-lang?source=pwa",
+  "id": "/pwa-loading?source=pwa",
+  "start_url": "/pwa-loading?source=pwa",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",

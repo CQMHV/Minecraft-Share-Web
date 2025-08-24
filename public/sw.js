@@ -1,11 +1,11 @@
 // 当前缓存版本号，更新时要改名
-const CACHE_NAME = 'mcshare-cache-v6';
+const CACHE_NAME = 'mcshare-cache-v7';
 
 // 预缓存的资源（安装阶段一次性写入）
 const PRECACHE_URLS = [
   '/',            // 首页
-  '/pwa-lang',    // PWA 启动入口（确保离线可用）
-  '/styles.css'   // 常用样式文件
+  '/pwa-loading',    // PWA 启动入口（确保离线可用）
+  '/css/styles.css'   // 常用样式文件
 ];
 
 // 安装阶段：预缓存资源
@@ -54,9 +54,9 @@ self.addEventListener('fetch', event => {
       });
       return cached || await net;
     } catch (err) {
-      // 离线兜底：导航请求返回 /pwa-lang
+      // 离线兜底：导航请求返回 /pwa-loading，其他请求返回 503
       if (isNavigate) {
-        return (await caches.match('/pwa-lang')) || new Response('Offline', { status: 503 });
+        return (await caches.match('/pwa-loading')) || new Response('Offline', { status: 503 });
       }
       // 其它请求：若缓存有就返回，否则返回 503
       const cached = await caches.match(req);
