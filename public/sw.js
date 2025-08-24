@@ -1,5 +1,5 @@
 // 当前缓存版本号，更新时要改名
-const CACHE_NAME = 'mcshare-cache-v5';
+const CACHE_NAME = 'mcshare-cache-v6';
 
 // 预缓存的资源（安装阶段一次性写入）
 const PRECACHE_URLS = [
