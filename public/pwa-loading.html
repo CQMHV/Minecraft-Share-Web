@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <title>Minecraft Share - Launching</title>
@@ -17,6 +18,7 @@
       --bg: #ffffff;
       --fg: #1f1f1f;
     }
+
     @media (prefers-color-scheme: dark) {
       :root {
         --bg: #0b0f0c;
@@ -24,7 +26,8 @@
       }
     }
 
-    html, body {
+    html,
+    body {
       height: 100%;
       margin: 0;
       background: var(--bg);
@@ -33,14 +36,19 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
     }
 
-    .wrap { text-align: center; }
+    .wrap {
+      text-align: center;
+    }
 
     .logo {
-      width: 160px; height: 160px; object-fit: cover;
+      width: 160px;
+      height: 160px;
+      object-fit: cover;
       border-radius: 24px;
-      box-shadow: 0 8px 24px rgba(0,0,0,.08);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
       opacity: 0;
       transition: opacity 1s ease;
     }
@@ -53,14 +61,29 @@
       transition: opacity 1.2s ease;
     }
 
-    .show { opacity: 1; }
+    .show {
+      opacity: 1;
+    }
+
+    /* 网络错误提示样式 */
+    .error-message {
+      color: red;
+      font-weight: bold;
+      margin-top: 20px;
+      display: none;  /* 默认隐藏 */
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap">
-    <img src="/images/Homepage_Gameplay-Trailer_MC-OV-logo_300x300.png" 
-         alt="App logo" class="logo" id="logo" />
-    <h1 id="title">Minecraft Share</h1>
+    <img src="/images/Homepage_Gameplay-Trailer_MC-OV-logo_300x300.png" alt="App logo" class="logo" id="logo" />
+    <h1 id="title">Welcome to MC Share</h1>
+
+    <!-- 网络错误提示 -->
+    <div id="error-message" class="error-message">
+      You may be offline, please check your network connection.
+    </div>
   </div>
 
   <!-- ✅ 引入公共的 SW 注册脚本 -->
@@ -75,10 +98,37 @@
       }, 300);
     });
 
-    // 2 秒后无条件跳转首页（不管 SW 是否 ready）
-    setTimeout(() => {
-      location.replace('/');
-    }, 2000);
+    // 监测 SW 注册完成后跳转
+    window.addEventListener('load', () => {
+      let timeoutTriggered = false;
+
+      // 超过 10 秒未跳转时显示提示
+      const timeout = setTimeout(() => {
+        timeoutTriggered = true;
+        document.getElementById('error-message').style.display = 'block';
+      }, 10000); // 10秒
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(() => {
+          // 如果 SW 注册完成，2 秒后跳转
+          setTimeout(() => {
+            if (!timeoutTriggered) {
+              location.replace('/');
+            }
+          }, 2000);  // 等 2 秒后跳转
+        }).catch((error) => {
+          console.error('Service Worker 注册失败:', error);
+          // 如果 SW 注册失败，显示提示
+          document.getElementById('error-message').style.display = 'block';
+        });
+      }
+
+      // 在注册完成后清除超时
+      window.addEventListener('beforeunload', () => {
+        clearTimeout(timeout);
+      });
+    });
   </script>
 </body>
+
 </html>
