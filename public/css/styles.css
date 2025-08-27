@@ -5,8 +5,13 @@
     /* 去掉移动端的点击高亮（iOS/Android） */
     -webkit-tap-highlight-color: transparent;
 }
+/* 鼠标悬停时显示手形光标 */
+.clickable {
+    cursor: pointer;
+}
 /* 基础交互元素默认不显示边框outline */
 a,
+.clickable,
 button,
 input,
 textarea,
@@ -17,6 +22,7 @@ select {
 }
 /* 亮色模式下的无障碍焦点边框outline样式 */
 a:focus-visible,
+.clickable:focus-visible,
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
@@ -28,6 +34,7 @@ select:focus-visible {
 /* 深色模式下的无障碍焦点边框outline样式 */
 @media (prefers-color-scheme: dark) {
     a:focus-visible,
+    .clickable:focus-visible,
     button:focus-visible,
     input:focus-visible,
     textarea:focus-visible,
@@ -36,11 +43,34 @@ select:focus-visible {
     }
 }
 
-
+/* === 通用页面主体设置 === */
+main {
+    font-family: "Segoe UI", sans-serif;
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: auto;
+}
+/* === 通用字体设置（含移动端适配） === */
+h3 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+p {
+    line-height: 1.6;
+}
+@media (max-width: 768px) {
+    h3 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+}
+/* 清除a的下划线和点击色 */
 a{
     text-decoration: none;
     color:unset;
 }
+/* 隐藏h1,h2 */
 h1,h2{
     position:absolute;
     left:-9999px;
@@ -49,14 +79,17 @@ h1,h2{
 /* 设置导航栏 */
 nav {
     position: fixed;
-    top: 0;
-    width: 100%;
+    top: 10px;
+    width: calc(100% - 20px);
+    margin: 0 10px;
     height: 60px;
     background-color: #007a08;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 18px;
 }
 /* 默认横向菜单（桌面端） */
 nav ul {
@@ -72,15 +105,18 @@ nav ul {
 }
 /* 菜单项 */
 nav ul li a {
+    background: #008b0a;
+    border-radius: 8px;
+    transition: filter 0.3s;
     color: #afffb5;
     font-size: 21px;
     display: inline-block;
-    padding: 5px 12px;
+    padding: 3px 12px;
     text-decoration: none;
 }
 /* 悬停样式 */
 nav ul li a:hover {
-    color: #5eff69;
+    filter: brightness(1.2);        /* 整体亮一点 */
 }
 /* 汉堡按钮（默认隐藏） */
 .menu-toggle {
@@ -112,20 +148,22 @@ nav ul li a:hover {
     .menu-backdrop.show {
         display: block;
         position: fixed;
-        top: 60px;
+        top: 80px;
         left: 0;
-        width: 100%;
+        width: calc(100% - 20px);
+        margin: 0 10px;
         background-color: #008b0a;
         z-index: 998;
-        border-radius: 0 0 12px 12px;
+        border-radius: 18px;
         height: auto; /* 动态设置 via JS */
     }
     /* 导航菜单：默认隐藏，展开为纵向 */
     nav ul {
         position: fixed;
-        top: 60px;
+        top: 80px;
         left: 0;
-        width: 100%;
+        width: calc(100% - 20px);
+        margin: 0 10px;
         display: none;
         flex-direction: column;
         z-index: 999;
@@ -185,6 +223,7 @@ body{
 footer{
     width: 100%;
     padding:5px;
+    padding-bottom: 20px;
     background-color:#007a08;
     display:flex;
     justify-content:center;
@@ -198,8 +237,11 @@ footer{
     padding: 6px 10px;
     border-radius: 6px;
     background-color: #1c9149;
-    transition: background 0.2s;
+    transition: filter 0.3s;
     font-size: 20px;
+}
+.language:hover {
+    filter: brightness(1.2);        /* 整体亮一点 */
 }
 footer p{
     margin-top: 20px;
@@ -222,16 +264,22 @@ footer p{
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    transition: filter 0.3s;
 }
 .social-btn img {
     width: 24px;
     height: 24px;
     margin-bottom: 6px;
-    transition: transform 0.2s;
+    transition: transform 0.3s;
 }
 .social-btn span {
     font-size: 13px;
     text-align: center;
+}
+.social-btn .img{
+    font-size: 21px;
+    margin-bottom: 6px;
+    transition: transform 0.3s;
 }
 
 /* 品牌背景色 */
@@ -247,7 +295,7 @@ footer p{
 .social-btn:hover {
     filter: brightness(1.2);        /* 整体亮一点 */
 }
-.social-btn:hover img {
+.social-btn:hover img,.social-btn:hover .img {
     transform: scale(1.1);         /* 图标稍微放大 */
 }
 
@@ -256,7 +304,7 @@ footer p{
     background-color: #FA7299;
 }
 .social-btn.bilibili img {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     object-fit: contain;
 }
