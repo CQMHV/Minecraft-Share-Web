@@ -41,3 +41,17 @@ section { margin-bottom: 60px; }
     border-radius: 10%;
     object-fit: cover;
 }
+.community-link-text-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.QQpindao img {
+    background: #0bcdf8;
+    padding:12%;
+}
+.discord img {
+    background: #5865F2;
+    padding:15%;
+}

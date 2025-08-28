@@ -244,7 +244,7 @@ footer{
     filter: brightness(1.2);        /* 整体亮一点 */
 }
 footer p{
-    margin-top: 20px;
+    margin: 10px;
 }
 /* 社交媒体按钮样式 */
 .social-grid {
