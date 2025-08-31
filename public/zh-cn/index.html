@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft|我的世界|首页</title>
+    <title>Minecraft Share | 首页</title>
     <meta name="description" content="对Minecraft(我的世界)的信息共享网站。Minecraft是一款由Mojang工作室开发的沙盒游戏，现在是微软旗下游戏。分为两个版本，分别是基岩版和Java版。">
     <meta name="keywords" content="Minecraft,我的世界,沙盒游戏,Mojang,java，基岩,微软,Microsoft,CQMHV,才倾梦华V,游戏服务器,Game server">
     <meta name="author" content="CQMHV才倾梦华V">
@@ -21,9 +21,7 @@
     <link rel="alternate" hreflang="es-es" href="https://minecraft.cqmhv.com/es-es/">
     <link rel="alternate" hreflang="pt-br" href="https://minecraft.cqmhv.com/pt-br/">
     <link rel="alternate" hreflang="ru-ru" href="https://minecraft.cqmhv.com/ru-ru/">
-    <link rel="alternate" hreflang="ar-sa" href="https://minecraft.cqmhv.com/ar-sa/">
     <link rel="alternate" hreflang="it-it" href="https://minecraft.cqmhv.com/it-it/">
-    <link rel="alternate" hreflang="hi-in" href="https://minecraft.cqmhv.com/hi-in/">
     <link rel="alternate" hreflang="id-id" href="https://minecraft.cqmhv.com/id-id/">
     <link rel="alternate" hreflang="x-default" href="https://minecraft.cqmhv.com/en-us/">
 
@@ -34,7 +32,7 @@
     <!-- 页面描述：在卡片中显示的简要介绍 -->
     <meta property="og:image" content="https://minecraft.cqmhv.com/images/og-image.jpg">
     <!-- 分享预览图：建议分辨率1200x630，必须为绝对地址 -->
-    <meta property="og:url" content="https://minecraft.cqmhv.com/zh-cn">
+    <meta property="og:url" content="https://minecraft.cqmhv.com/zh-cn/">
     <!-- 当前页面的完整链接地址 -->
     <meta property="og:type" content="website">
     <!-- 类型为网站主页，常用值还有 article、video 等 -->
@@ -92,10 +90,10 @@
 
     <header>
 
-        <h1>Minecraft Share|我的世界分享</h1>
+        <h1>Minecraft Share|我的世界分享|首页</h1>
         <h2>我的世界，Mojang开发的一款沙盒游戏，现在是微软旗下游戏。分为两个版本，分别是基岩版和Java版。</h2>
         <nav>
-            <div class="menu-toggle  clickable" role="link" tabindex="1" id="menu-toggle">☰</div>
+            <div class="menu-toggle  clickable" role="link" tabindex="1" id="menu-toggle">☰</div><span class="menu-toggle">首页</span>
             <div class="menu-backdrop" id="menu-backdrop"></div> <!-- ☰的背景层 -->
             <ul id="nav-menu">
                 <li><a href="/zh-cn/">首页</a></li>
@@ -113,19 +111,25 @@
         <!-- 轮播图横幅 -->
         <section class="carousel">
             <div class="carousel-inner">
-                <div class="carousel-item  is-active" style="background-image:url('/images/carousel/banner1.webp')">
+                <div class="carousel-item is-active" style="background-image:url('/images/home-carousel/banner0.webp')">
+                    <div class="carousel-caption clickable" role="link" tabindex="0" onclick="location.href='/announcement/zh-cn/'" onkeydown="if(event.key==='Enter'){location.href='/announcement/zh-cn/';}">
+                        <h3>网站公告</h3>
+                        <p>查看网站公告，获取最新信息</p>
+                    </div>
+                </div>
+                <div class="carousel-item" style="background-image:url('/images/home-carousel/banner1.webp')">
                     <div class="carousel-caption clickable" role="link" tabindex="0" onclick="location.href='/zh-cn/resources/mods/'" onkeydown="if(event.key==='Enter'){location.href='/zh-cn/resources/mods/';}">
                         <h3>探索精彩模组</h3>
                         <p>全新模组分享，支持多个版本</p>
                     </div>
                 </div>
-                <div class="carousel-item" style="background-image:url('/images/carousel/banner2.webp')">
+                <div class="carousel-item" style="background-image:url('/images/home-carousel/banner2.webp')">
                     <div class="carousel-caption clickable" role="link" tabindex="0" onclick="location.href='/zh-cn/servers/'" onkeydown="if(event.key==='Enter'){location.href='/zh-cn/servers/';}">
                         <h3>加入全球服务器</h3>
                         <p>发现属于你的 Minecraft 社区</p>
                     </div>
                 </div>
-                <div class="carousel-item" style="background-image:url('/images/carousel/banner3.webp')">
+                <div class="carousel-item" style="background-image:url('/images/home-carousel/banner3.webp')">
                     <div class="carousel-caption clickable" role="link" tabindex="0" onclick="location.href='/zh-cn/community/'" onkeydown="if(event.key==='Enter'){location.href='/zh-cn/community/';}">
                         <h3>加入国际社区</h3>
                         <p>了解交流和提问 Minecraft</p>
@@ -159,9 +163,9 @@
         <section class="categories">
             <h3>探索内容分类</h3>
             <div class="categories-grid">
-                <a href="/zh-cn/resources/archives/" class="category-card">📁 存档</a>
-                <a href="/zh-cn/resources/mods/" class="category-card">🧱 模组</a>
-                <a href="/zh-cn/resources/resourcepacks/" class="category-card">🎨 材质包</a>
+                <a href="/resources/archives/" class="category-card">📁 存档</a>
+                <a href="/resources/mods/" class="category-card">🧱 模组</a>
+                <a href="/resources/resourcepacks/" class="category-card">🎨 材质包</a>
                 <a href="/zh-cn/servers/" class="category-card">🌍 服务器</a>
                 <a href="/guides/zh-cn/" class="category-card">📚 指南</a>
                 <a href="/announcement/zh-cn/" class="category-card">📢 公告</a>
@@ -171,6 +175,11 @@
         <!-- 最新分享区 -->
         <section class="latest">
             <h3>最新内容</h3>
+            <ul class="latest-list">
+                <li>
+                    <a href="/announcement/">本站公告 - Minecraft Share</a>
+                </li>
+            </ul>
             <ul class="latest-list" id="news-container">
                 <li>
                     <span>加载中...</span>
@@ -184,7 +193,9 @@
 
     <footer>
 
-        <p>&copy; 2025 Minecraft 分享. 保留所有权利。</p>
+        <p>&copy; 2025 Minecraft Share - 保留所有权利。</p>
+        <p>本站GitHub项目仓库地址：<a href="https://github.com/CQMHV/Minecraft-Share-Web/" class="github-repository" target="_blank" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/github/FFFFFF" alt="GitHub"></a></p>
+        <p>"Minecraft"以及"我的世界"为美国微软公司的商标 本站与微软公司没有从属关系</p>
         <a class="language" href="/set-lang/">语言选择</a>
         <p>本站由 <a href="https://www.cqmhv.com/" target="_blank" rel="noopener noreferrer">CQMHV才倾梦华V</a> 提供技术支持。</p>
         <div class="social-grid">

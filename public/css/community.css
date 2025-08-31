@@ -13,6 +13,8 @@ section { margin-bottom: 60px; }
         grid-template-columns: 1fr;
     }
 }
+
+/* === 社交链接和宣传链接板块卡片样式设置 === */
 .community-link-card {
     display: grid;
     grid-template-columns: 1fr 2fr;
@@ -23,9 +25,8 @@ section { margin-bottom: 60px; }
     border-radius: 12px;
     transition: background 0.3s;
     height: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
+.community-link-card:hover { background: #d2ecff; }
 .community-link-img-item {
     min-height:0;
     width: 100%;
@@ -38,20 +39,38 @@ section { margin-bottom: 60px; }
     min-height: 0;
     max-width: 100%;
     max-height: 100%;
+    aspect-ratio: 1 / 1;
     border-radius: 10%;
-    object-fit: cover;
+    object-fit: contain;
 }
 .community-link-text-item {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-
-.QQpindao img {
-    background: #0bcdf8;
+.community-link-text-item p {
+    overflow: hidden;
+}
+/* 卡片中不同平台的图标背景色和内边距设置 */
+.community-link-img-item.QQpindao img {
+    background-color: #0bcdf8;
     padding:12%;
 }
-.discord img {
-    background: #5865F2;
+.community-link-img-item.discord img {
+    background-color: #5865F2;
     padding:15%;
+}
+.community-link-img-item.reddit img { 
+    background-color: #FF4500;
+    padding:15%;
+}
+.community-link-img-item.mcbbs img { 
+    background-color: #8BBFFE;
+    padding:9%;
+}
+.community-link-img-item.minecraftwiki img { 
+    background-color: #794D2C;
+    padding:9%;
 }

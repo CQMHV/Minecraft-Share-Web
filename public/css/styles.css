@@ -135,11 +135,16 @@ nav ul li a:hover {
     }
     /* 汉堡按钮显示 */
     .menu-toggle {
-        display: block;
+        display: inline-block;
+        vertical-align: middle;
         font-size: 32px;
         color: #afffb5;
         cursor: pointer;
-        z-index: 1001; /* 高于菜单与背景 */
+    }
+    span.menu-toggle {
+        display:inline-block;
+        vertical-align: middle;
+        font-size: 24px;
     }
     /* 背景层（动态高度） */
     .menu-backdrop {
@@ -222,7 +227,7 @@ body{
 
 footer{
     width: 100%;
-    padding:5px;
+    padding:10px;
     padding-bottom: 20px;
     background-color:#007a08;
     display:flex;
@@ -232,8 +237,22 @@ footer{
     color:#e9f9f2;
     font-size: 16px;
 }
+/* GitHub仓库图标样式 */
+.github-repository img {
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    vertical-align: middle;
+    background-color:#181717;
+    border-radius: 6px;
+    transition: filter 0.3s;
+}
+.github-repository:hover {
+    filter: brightness(1.8);        /* 整体亮一些 */
+}
+/* 语言选择按钮样式 */
 .language{
-    margin-top:20px;
+    margin:8px;
     padding: 6px 10px;
     border-radius: 6px;
     background-color: #1c9149;
@@ -244,7 +263,8 @@ footer{
     filter: brightness(1.2);        /* 整体亮一点 */
 }
 footer p{
-    margin: 10px;
+    margin: 8px;
+    text-align: center;
 }
 /* 社交媒体按钮样式 */
 .social-grid {
@@ -252,7 +272,7 @@ footer p{
     flex-wrap: wrap;              /* 自动换行 */
     justify-content: center;      /* 按钮组居中对齐 */
     gap: 12px;
-    margin-top: 20px;
+    margin: 8px;
 }
 .social-btn {
     width: 80px;

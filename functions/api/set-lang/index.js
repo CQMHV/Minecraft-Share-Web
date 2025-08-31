@@ -14,8 +14,8 @@
 // - If you want to restrict to canonical host for Origin checks, set CANONICAL_HOST in Pages env (e.g. "minecraft.cqmhv.com").
 
 const SUPPORTED = [
-  "zh-cn","zh-tw","en-us","ja-jp","ko-kr","fr-fr","de-de",
-  "es-es","pt-br","ru-ru","ar-sa","it-it","hi-in","id-id"
+  "zh-cn","zh-tw","en-us","ja-jp","ko-kr","fr-fr",
+  "de-de","es-es","pt-br","ru-ru","it-it","id-id"
 ];
 
 function isSupported(lang) {
