@@ -26,7 +26,7 @@
     justify-content: center;
     opacity: 0;
     z-index: 0;
-    transition: opacity 600ms ease; /* 淡入淡出时长可与 data-transition 对齐 */
+    transition: opacity 600ms ease; /* 淡入淡出时长可与 carousel.js 对齐 */
 }
 
 .carousel-item.is-active {

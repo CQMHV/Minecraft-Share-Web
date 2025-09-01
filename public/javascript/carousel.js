@@ -9,8 +9,8 @@
             this.nextBtn = root.querySelector(".carousel-btn.next") || root.querySelector(".nextBtn");
             this.prevBtn = root.querySelector(".carousel-btn.prev") || root.querySelector(".prevBtn");
 
-            this.transitionMs = Number(root.dataset.transition ?? opts.transitionMs ?? 500);
-            this.intervalMs = Number(root.dataset.interval ?? opts.intervalMs ?? 5000);
+            this.transitionMs = Number(root.dataset.transition ?? opts.transitionMs ?? 600);
+            this.intervalMs = Number(root.dataset.interval ?? opts.intervalMs ?? 3000);
             this.enableKeyboard = (root.dataset.keyboard ?? (opts.enableKeyboard ?? "true")) !== "false";
 
             this.n = this.items.length;
