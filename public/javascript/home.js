@@ -11,17 +11,27 @@ async function loadNews() {
 
     try {
         const res = await fetch('/api/news');
+        if (!res.ok) {
+            container.innerHTML = `<li><span style="color:red;">加载失败：${res.status}</span></li>`;
+            return;
+        }
         const data = await res.json();
+
+        if (!Array.isArray(data.news)) {
+            container.innerHTML = '<li><span style="color:red;">新闻数据缺失</span></li>';
+            return;
+        }
 
         container.innerHTML = ''; // 清空占位符
 
         data.news.forEach(item => {
             const li = document.createElement('li');
-            
+
             const a = document.createElement('a');
             a.href = item.url;
             a.textContent = item.title;
             a.target = '_blank';
+            a.rel = 'noopener noreferrer';
 
             // 如果后端 JSON 有 date 字段就显示
             const span = document.createElement('span');
