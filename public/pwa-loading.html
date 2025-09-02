@@ -107,14 +107,6 @@
       }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      .text-container.scroll .line1,
-      .text-container.scroll .line2 {
-        animation: none;
-        transform: translateY(0);
-      }
-    }
-
     .show {
       opacity: 1;
     }
@@ -154,11 +146,9 @@
       logo.classList.add('show');
       setTimeout(() => {
         title.classList.add('show');
-        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          setTimeout(() => {
-            title.classList.add('scroll');
-          }, 300);
-        }
+        setTimeout(() => {
+          title.classList.add('scroll');
+        }, 300);
       }, 300);
     });
 
@@ -174,12 +164,12 @@
 
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.ready.then(() => {
-          // 如果 SW 注册完成，2 秒后跳转
+          // 如果 SW 注册完成，3 秒后跳转
           setTimeout(() => {
             if (!timeoutTriggered) {
               location.replace('/');
             }
-          }, 2000);  // 等 2 秒后跳转
+          }, 3000);  // 等 3 秒后跳转
         }).catch((error) => {
           console.error('Service Worker 注册失败:', error);
           // 如果 SW 注册失败，显示提示
