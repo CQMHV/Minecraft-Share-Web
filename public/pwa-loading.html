@@ -53,12 +53,58 @@
       transition: opacity 1s ease;
     }
 
-    h1 {
+    .text-container {
       margin-top: 16px;
       font-size: 20px;
       font-weight: 700;
+      line-height: 1.2;
+      height: 1.2em;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .text-container h1 {
+      margin: 0;
+      font: inherit;
+      position: absolute;
+      width: 100%;
+      white-space: nowrap;
       opacity: 0;
       transition: opacity 1.2s ease;
+    }
+
+    .text-container .line2 {
+      transform: translateY(100%);
+    }
+
+    .text-container.show h1 {
+      opacity: 1;
+    }
+
+    .text-container.scroll .line1 {
+      animation: slide-up 1s forwards;
+    }
+
+    .text-container.scroll .line2 {
+      animation: slide-up-2 1s forwards;
+    }
+
+    @keyframes slide-up {
+      0%, 40% {
+        transform: translateY(0);
+      }
+      60%, 100% {
+        transform: translateY(-100%);
+      }
+    }
+
+    @keyframes slide-up-2 {
+      0%, 40% {
+        transform: translateY(100%);
+      }
+      60%, 100% {
+        transform: translateY(0);
+      }
     }
 
     .show {
@@ -78,7 +124,10 @@
 <body>
   <div class="wrap">
     <img src="/images/Homepage_Gameplay-Trailer_MC-OV-logo_300x300.png" alt="App logo" class="logo" id="logo" />
-    <h1 id="title">Welcome to MC Share</h1>
+    <div id="title" class="text-container">
+      <h1 class="line1">Minecraft Share</h1>
+      <h1 class="line2">Welcome to Minecraft Share!</h1>
+    </div>
 
     <!-- 网络错误提示 -->
     <div id="error-message" class="error-message">
@@ -90,11 +139,16 @@
   <script src="/javascript/register-sw.js" defer></script>
 
   <script>
-    // 图标 + 文本淡入
+    // 图标 + 文本淡入并滚动
     window.addEventListener('load', () => {
-      document.getElementById('logo').classList.add('show');
+      const logo = document.getElementById('logo');
+      const title = document.getElementById('title');
+      logo.classList.add('show');
       setTimeout(() => {
-        document.getElementById('title').classList.add('show');
+        title.classList.add('show');
+        setTimeout(() => {
+          title.classList.add('scroll');
+        }, 300);
       }, 300);
     });
 
@@ -110,12 +164,12 @@
 
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.ready.then(() => {
-          // 如果 SW 注册完成，2 秒后跳转
+          // 如果 SW 注册完成，3 秒后跳转
           setTimeout(() => {
             if (!timeoutTriggered) {
               location.replace('/');
             }
-          }, 2000);  // 等 2 秒后跳转
+          }, 3000);  // 等 3 秒后跳转
         }).catch((error) => {
           console.error('Service Worker 注册失败:', error);
           // 如果 SW 注册失败，显示提示
