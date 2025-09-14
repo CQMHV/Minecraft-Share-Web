@@ -1,0 +1,4 @@
+index.js	    Pages Functions专用网页语言自动跳转代码和cookies写入
+_routes.json    确保优先加载public
+api/set-lang    手动选择语言写入cookies
+indexnow.js     IndexNow协议提交api，由GitHub Actions触发

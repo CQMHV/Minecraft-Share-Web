@@ -1,0 +1,331 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* 去掉移动端的点击高亮（iOS/Android） */
+    -webkit-tap-highlight-color: transparent;
+}
+/* 鼠标悬停时显示手形光标 */
+.clickable {
+    cursor: pointer;
+}
+/* 基础交互元素默认不显示边框outline */
+a,
+.clickable,
+button,
+input,
+textarea,
+select {
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    background-clip: padding-box;
+}
+/* 亮色模式下的无障碍焦点边框outline样式 */
+a:focus-visible,
+.clickable:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 2px solid #2684FF; /* Google 常用的蓝色 */
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+/* 深色模式下的无障碍焦点边框outline样式 */
+@media (prefers-color-scheme: dark) {
+    a:focus-visible,
+    .clickable:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible {
+        outline: 2px solid #8AB4F8; /* Google Material 的浅蓝色 */
+    }
+}
+
+/* === 通用页面主体设置 === */
+main {
+    font-family: "Segoe UI", sans-serif;
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: auto;
+}
+/* === 通用字体设置（含移动端适配） === */
+h3 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+p {
+    line-height: 1.6;
+}
+@media (max-width: 768px) {
+    h3 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+}
+/* 清除a的下划线和点击色 */
+a{
+    text-decoration: none;
+    color:unset;
+}
+/* 隐藏h1,h2 */
+h1,h2{
+    position:absolute;
+    left:-9999px;
+}
+
+/* 设置导航栏 */
+nav {
+    position: fixed;
+    top: 10px;
+    width: calc(100% - 20px);
+    max-width: 1800px;
+    margin: 0 10px;
+    height: 60px;
+    background-color: #007a08;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 18px;
+}
+/* 默认横向菜单（桌面端） */
+nav ul {
+    width: 75%;
+    height: 42px;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 5%;
+    background: #008b0a;
+    border-radius: 12px;
+}
+/* 菜单项 */
+nav ul li a {
+    background: #008b0a;
+    border-radius: 8px;
+    transition: filter 0.3s;
+    color: #afffb5;
+    font-size: 21px;
+    display: inline-block;
+    padding: 3px 12px;
+    text-decoration: none;
+}
+/* 悬停样式 */
+nav ul li a:hover {
+    filter: brightness(1.2);        /* 整体亮一点 */
+}
+/* 汉堡按钮（默认隐藏） */
+.menu-toggle {
+    display: none;
+    font-size: 32px;
+    color: #afffb5;
+    cursor: pointer;
+    padding: 10px;
+}
+/* 移动端样式 */
+@media (max-width: 768px) {
+    /* 顶部导航栏间距调整 */
+    nav {
+        justify-content: space-between;
+        padding: 0 20px;
+    }
+    /* 汉堡按钮显示 */
+    .menu-toggle {
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 32px;
+        color: #afffb5;
+        cursor: pointer;
+    }
+    span.menu-toggle {
+        display:inline-block;
+        vertical-align: middle;
+        font-size: 24px;
+    }
+    /* 背景层（动态高度） */
+    .menu-backdrop {
+        display: none;
+    }
+    .menu-backdrop.show {
+        display: block;
+        position: fixed;
+        top: 80px;
+        left: 0;
+        width: calc(100% - 20px);
+        margin: 0 10px;
+        background-color: #008b0a;
+        z-index: 998;
+        border-radius: 18px;
+        height: auto; /* 动态设置 via JS */
+    }
+    /* 导航菜单：默认隐藏，展开为纵向 */
+    nav ul {
+        position: fixed;
+        top: 80px;
+        left: 0;
+        width: calc(100% - 20px);
+        margin: 0 10px;
+        display: none;
+        flex-direction: column;
+        z-index: 999;
+        padding: 12px 0;
+        background: transparent; /* 交由 .menu-backdrop 显示背景 */
+    }
+    nav ul.show {
+        display: flex;
+    }
+    nav ul li {
+        width: 100%;
+        text-align: center;
+        margin: 6px 0;
+    }
+    nav ul li a {
+        display: block;
+        width: 100%;
+        padding: 12px 0;
+        font-size: 20px;
+        color: #ffffff;
+        text-decoration: none;
+    }
+    nav ul li a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #5eff69;
+    }
+}
+
+/*设置body背景*/
+body{
+    animation: gradientFlow 15s ease infinite;
+    background: linear-gradient(-45deg, #d6f1e3, #e9f9f2, #c9e9d4, #a4d3b2);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 200% 200%;
+    padding-top: 60px;
+}
+/*设置body背景所需的动画*/
+@keyframes gradientFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+/*设置body背景动画对移动端的优化*/
+@media (max-width: 768px) {
+    body {
+        background-color: lightblue;
+    }
+}
+
+footer{
+    width: 100%;
+    padding:10px;
+    padding-bottom: 20px;
+    background-color:#007a08;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    color:#e9f9f2;
+    font-size: 16px;
+}
+/* GitHub仓库图标样式 */
+.github-repository img {
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    vertical-align: middle;
+    background-color:#181717;
+    border-radius: 6px;
+    transition: filter 0.3s;
+}
+.github-repository:hover {
+    filter: brightness(1.8);        /* 整体亮一些 */
+}
+/* 语言选择按钮样式 */
+.language{
+    margin:8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background-color: #1c9149;
+    transition: filter 0.3s;
+    font-size: 20px;
+}
+.language:hover {
+    filter: brightness(1.2);        /* 整体亮一点 */
+}
+footer p{
+    margin: 8px;
+    text-align: center;
+}
+/* 社交媒体按钮样式 */
+.social-grid {
+    display: flex;
+    flex-wrap: wrap;              /* 自动换行 */
+    justify-content: center;      /* 按钮组居中对齐 */
+    gap: 12px;
+    margin: 8px;
+}
+.social-btn {
+    width: 80px;
+    height: 80px;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: filter 0.3s;
+}
+.social-btn img {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 6px;
+    transition: transform 0.3s;
+}
+.social-btn span {
+    font-size: 13px;
+    text-align: center;
+}
+.social-btn .img{
+    font-size: 21px;
+    margin-bottom: 6px;
+    transition: transform 0.3s;
+}
+
+/* 品牌背景色 */
+.social-btn.github  { background-color: #181717; }
+.social-btn.youtube { background-color: #FF0000; }
+.social-btn.x       { background-color: #000000; }
+.social-btn.twitch  { background-color: #9146FF; }
+.social-btn.discord { background-color: #5865F2; }
+.social-btn.reddit  { background-color: #FF4500; }
+.social-btn.website { background-color: #007ACC; }
+
+/* 悬浮效果 */
+.social-btn:hover {
+    filter: brightness(1.2);        /* 整体亮一点 */
+}
+.social-btn:hover img,.social-btn:hover .img {
+    transform: scale(1.1);         /* 图标稍微放大 */
+}
+
+/* 单独为Billbill图标适配 */
+.social-btn.bilibili {
+    background-color: #FA7299;
+}
+.social-btn.bilibili img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}

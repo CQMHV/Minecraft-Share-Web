@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Language Selection</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, follow">
+  <style>
+    body { font-family: sans-serif; background: linear-gradient(135deg,#f4f7f8,#dfe9ec); margin:0; padding:0; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+    .container { max-width:700px; background:#fff; padding:2em; border-radius:1rem; box-shadow:0 10px 30px rgba(0,0,0,.1); margin:20px; }
+    h1 { text-align:center; margin-bottom:1.5em; }
+    .lang-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1em; }
+    .lang-grid a { display:flex; align-items:center; padding:.8em; background:#f0f4f7; border-radius:.5rem; text-decoration:none; color:#333; font-weight:bold; transition:.2s; }
+    .lang-grid a:hover { background:#d0e4f5; transform:translateY(-2px); }
+    .flag { width:24px; height:16px; margin-right:.6em; object-fit:cover; border-radius:2px; }
+    .visually-hidden { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
+    #status { margin-top:12px; text-align:center; color:#666; font-size:.95rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌍 Choose Your Language</h1>
+
+    <div class="lang-grid" role="list">
+      <!-- 无 JS 回退：href 指向 /api/set-lang?lang=xx -->
+      <a role="listitem" data-lang="zh-cn" href="/api/set-lang?lang=zh-cn"><img class="flag" src="https://flagcdn.com/cn.svg" alt="China">简体中文</a>
+      <a role="listitem" data-lang="zh-tw" href="/api/set-lang?lang=zh-tw"><img class="flag" src="https://flagcdn.com/tw.svg" alt="Taiwan">繁體中文</a>
+      <a role="listitem" data-lang="en-us" href="/api/set-lang?lang=en-us"><img class="flag" src="https://flagcdn.com/us.svg" alt="USA">English</a>
+      <a role="listitem" data-lang="ja-jp" href="/api/set-lang?lang=ja-jp"><img class="flag" src="https://flagcdn.com/jp.svg" alt="Japan">日本語</a>
+      <a role="listitem" data-lang="ko-kr" href="/api/set-lang?lang=ko-kr"><img class="flag" src="https://flagcdn.com/kr.svg" alt="Korea">한국어</a>
+      <a role="listitem" data-lang="fr-fr" href="/api/set-lang?lang=fr-fr"><img class="flag" src="https://flagcdn.com/fr.svg" alt="France">Français</a>
+      <a role="listitem" data-lang="de-de" href="/api/set-lang?lang=de-de"><img class="flag" src="https://flagcdn.com/de.svg" alt="Germany">Deutsch</a>
+      <a role="listitem" data-lang="es-es" href="/api/set-lang?lang=es-es"><img class="flag" src="https://flagcdn.com/es.svg" alt="Spain">Español</a>
+      <a role="listitem" data-lang="pt-br" href="/api/set-lang?lang=pt-br"><img class="flag" src="https://flagcdn.com/br.svg" alt="Brazil">Português (Brasil)</a>
+      <a role="listitem" data-lang="ru-ru" href="/api/set-lang?lang=ru-ru"><img class="flag" src="https://flagcdn.com/ru.svg" alt="Russia">Русский</a>
+      <a role="listitem" data-lang="it-it" href="/api/set-lang?lang=it-it"><img class="flag" src="https://flagcdn.com/it.svg" alt="Italy">Italiano</a>
+      <a role="listitem" data-lang="id-id" href="/api/set-lang?lang=id-id"><img class="flag" src="https://flagcdn.com/id.svg" alt="Indonesia">Bahasa Indonesia</a>
+    </div>
+
+    <div id="status" aria-live="polite" class="visually-hidden">Setting language…</div>
+  </div>
+
+  <script>
+    // 有 JS 时：POST /api/set-lang，成功后前端直跳 /<lang>/（使用后端返回的 location 更稳妥）
+    (function(){
+      const grid = document.querySelector('.lang-grid');
+      const statusEl = document.getElementById('status');
+      if (!grid) return;
+
+      grid.addEventListener('click', async (e) => {
+        const a = e.target.closest('a[data-lang]');
+        if (!a) return;
+        if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return; // 允许新开标签等
+        e.preventDefault();
+
+        const lang = a.getAttribute('data-lang');
+        if (!lang) { window.location = a.href; return; }
+
+        statusEl.classList.remove('visually-hidden');
+        statusEl.textContent = 'Setting language…';
+
+        try {
+          const res = await fetch('/api/set-lang', {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json', 'X-Requested-With':'XMLHttpRequest' },
+            body: JSON.stringify({ lang }),
+            credentials: 'same-origin'
+          });
+          if (!res.ok) { window.location = a.href; return; }
+
+          // 用后端返回的 location（已考虑 CANONICAL_HOST），否则退回 /<lang>/ 本地拼装
+          let loc = `/${lang}/`;
+          try { const j = await res.json(); if (j && j.location) loc = j.location; } catch(_) {}
+          window.location = loc;
+        } catch (err) {
+          console.error('set-lang POST failed, fallback to GET', err);
+          window.location = a.href; // 无 JS 回退
+        } finally {
+          statusEl.classList.add('visually-hidden');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

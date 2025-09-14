@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Wrangler Dev",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["wrangler", "pages", "dev", "./public", "--port", "8788"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "outputCapture": "std",
+      "serverReadyAction": {
+        "pattern": "Ready on",
+        "action": "startDebugging",
+        "name": "Chrome (Debug Profile)"
+      }
+    },
+    {
+      "name": "Chrome (Debug Profile)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:8788",
+      "userDataDir": true,         // 独立用户目录 = 独立窗口+缓存隔离
+      "webRoot": "${workspaceFolder}",
+      "runtimeArgs": ["--new-window"]
+    }
+  ]
+}

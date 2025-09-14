@@ -1,0 +1,118 @@
+/* === 轮播图 Carousel（淡入淡出版） === */
+.carousel {
+    position: relative;
+    overflow: hidden;
+    height: 360px;
+    margin-bottom: 60px;
+    border-radius: 12px;
+    background: #000;
+}
+
+/* 不再用横向滚动；改为层叠绝对定位 */
+.carousel-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* 每一页叠放在同一层，靠 opacity 切换 */
+.carousel-item {
+    position: absolute;
+    inset: 0; /* top/right/bottom/left: 0 */
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    z-index: 0;
+    transition: opacity 600ms ease; /* 淡入淡出时长可与 carousel.js 对齐 */
+}
+
+.carousel-item.is-active {
+    opacity: 1;
+    z-index: 1;
+}
+
+/* 字幕 */
+.carousel-caption {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 20px 30px;
+    border-radius: 8px;
+    color: #fff;
+    text-align: center;
+    max-width: 80%;
+    transform: translateY(0);
+    transition: opacity 400ms ease, transform 400ms ease;
+    opacity: 1;
+}
+
+/* 非当前项的字幕轻微下移并透明（可选美化） */
+.carousel-item:not(.is-active) .carousel-caption {
+    opacity: 0;
+    transform: translateY(8px);
+}
+
+/* 按钮 */
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2rem;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    padding: 8px 12px;
+    z-index: 20;
+    transition: background 0.3s;
+    user-select: none;
+}
+.carousel-btn:hover { background: rgba(0, 0, 0, 0.6); }
+.carousel-btn:focus-visible { outline: 2px solid #90caf9; outline-offset: 2px; }
+.carousel-btn.prev { left: 10px; }
+.carousel-btn.next { right: 10px; }
+
+/* 指示器（分页圆点） */
+.carousel-dots {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 12px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    z-index: 21;
+    pointer-events: none; /* 容器不拦截，按钮可点 */
+}
+.carousel-dots button {
+    pointer-events: auto;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+.carousel-dots button:hover { transform: scale(1.1); }
+.carousel-dots button:focus-visible { outline: 2px solid #90caf9; outline-offset: 2px; }
+.carousel-dots button.is-active { background: #fff; }
+
+/* 响应式：移动端降低高度，字幕更紧凑 */
+@media (max-width: 768px) {
+    .carousel { height: 220px; }
+    .carousel-caption {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+        max-width: 90%;
+    }
+}
+
+/* 动画减少偏好：关闭过渡，避免眩晕 */
+@media (prefers-reduced-motion: reduce) {
+    .carousel-item { transition: none !important; }
+    .carousel-caption { transition: none !important; }
+}

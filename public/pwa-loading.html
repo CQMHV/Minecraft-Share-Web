@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Minecraft Share - Launching</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- 主题色 -->
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b0f0c" media="(prefers-color-scheme: dark)" />
+
+    <style>
+        :root {
+            --bg: #ffffff;
+            --fg: #1f1f1f;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0b0f0c;
+                --fg: #e6e6e6;
+            }
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            background: var(--bg);
+            color: var(--fg);
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", Arial, sans-serif;
+        }
+        body {
+            display: grid;
+            place-items: center;
+        }
+
+        .wrap {
+            width: 100vw;
+            max-width: 640px;
+            padding: 0 16px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .logo {
+            width: 160px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+            opacity: 0;
+            transition: opacity 600ms ease; /* 改为 600ms */
+        }
+        .logo.show { opacity: 1; }
+
+        .title-box {
+            margin-top: 16px;
+            font-weight: 700;
+            line-height: 1.2;
+            overflow: hidden;
+            position: relative;
+        }
+        .title-inner {
+            display: grid;
+            gap: 0;
+            transform: translateY(0);
+            transition: transform 900ms ease;
+            will-change: transform;
+            opacity: 0;
+            transition-property: opacity, transform;
+            transition-duration: 900ms, 900ms;
+            transition-timing-function: ease, ease;
+        }
+        .title-inner.show { opacity: 1; }
+        .title-inner.scroll { transform: translateY(-50%); }
+
+        .line {
+            margin: 0;
+            white-space: normal;
+            word-break: break-word;
+            font-size: clamp(18px, 5vw, 20px);
+        }
+
+        .error-message {
+            color: #e53935;
+            font-weight: bold;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <img
+            src="/images/Homepage_Gameplay-Trailer_MC-OV-logo_300x300.png"
+            alt="App logo"
+            class="logo"
+            id="logo"
+        />
+
+        <div class="title-box" id="titleBox" aria-live="polite">
+            <div class="title-inner" id="titleInner">
+                <h1 class="line" id="line1">Minecraft Share</h1>
+                <h1 class="line" id="line2">Welcome to MC Share !</h1>
+            </div>
+        </div>
+
+        <div id="error-message" class="error-message">
+            You may be offline, please check your network connection.
+        </div>
+    </div>
+
+    <!-- 公共 SW 注册脚本 -->
+    <script src="/javascript/register-sw.js" defer></script>
+
+    <script>
+        function setTitleBoxHeight() {
+            const box = document.getElementById('titleBox');
+            const l1  = document.getElementById('line1');
+            const l2  = document.getElementById('line2');
+            if (!box || !l1 || !l2) return;
+            const h = Math.max(
+                Math.ceil(l1.getBoundingClientRect().height),
+                Math.ceil(l2.getBoundingClientRect().height)
+            );
+            box.style.height = h + 'px';
+        }
+
+        window.addEventListener('load', () => {
+            const logo  = document.getElementById('logo');
+            const inner = document.getElementById('titleInner');
+
+            setTitleBoxHeight();
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(setTitleBoxHeight);
+            }
+            window.addEventListener('resize', setTitleBoxHeight);
+
+            // —— 动画：先显示 logo，再标题，再滚动 —— //
+            requestAnimationFrame(() => {
+                // 强制一次回流，确保初始 opacity=0 应用
+                void logo.offsetWidth;
+                requestAnimationFrame(() => {
+                    logo.classList.add('show'); // 触发 600ms 淡入
+
+                    // 等 logo 完全淡入(600ms)再显示标题
+                    setTimeout(() => {
+                        inner.classList.add('show');
+                        // 第一行停留 1 秒
+                        setTimeout(() => {
+                            inner.classList.add('scroll');
+                        }, 1000);
+                    }, 600);
+                });
+            });
+        });
+
+        // —— SW 就绪与跳转/错误 —— //
+        window.addEventListener('load', () => {
+            let timeoutTriggered = false;
+            const timeout = setTimeout(() => {
+                timeoutTriggered = true;
+                document.getElementById('error-message').style.display = 'block';
+            }, 10000);
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then(() => {
+                    setTimeout(() => {
+                        if (!timeoutTriggered) {
+                            location.replace('/');
+                        }
+                    }, 3000);
+                }).catch((err) => {
+                    console.error('Service Worker 注册失败:', err);
+                    document.getElementById('error-message').style.display = 'block';
+                });
+            }
+
+            window.addEventListener('beforeunload', () => clearTimeout(timeout));
+        });
+    </script>
+</body>
+</html>

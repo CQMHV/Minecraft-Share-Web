@@ -1,0 +1,181 @@
+name: IndexNow Incremental + Semi-monthly Full
+
+on:
+  push:
+    branches: [ main ]              # 改成你的生产分支
+  workflow_dispatch: {}             # 允许手动触发
+  schedule:
+    - cron: '0 2 1,16 * *'          # 每月1日和16日 02:00 UTC（新加坡 10:00）
+
+env:
+  BASE_URL: https://minecraft.cqmhv.com
+  INDEXNOW_ENDPOINT: /indexnow
+
+jobs:
+  # ----------------------------
+  # A) 增量提交：仅提交本次改动
+  # ----------------------------
+  indexnow-incremental:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout (full history for diff)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve diff range
+        id: range
+        run: |
+          BEFORE="${{ github.event.before }}"
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            BEFORE="$(git rev-parse HEAD^ || true)"
+          fi
+          echo "before=$BEFORE" >> $GITHUB_OUTPUT
+          echo "after=${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Build incremental urls.json from git diff
+        id: build_urls
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os, json, subprocess
+          BASE = os.environ.get("BASE_URL","").rstrip("/")
+          if not BASE: raise SystemExit("BASE_URL is empty")
+          before = os.environ.get("RANGE_BEFORE")
+          after  = os.environ.get("RANGE_AFTER")
+          if not after: raise SystemExit("missing after sha")
+
+          args = ["git","diff","--name-status","-M","-z"]
+          if before: args += [before, after]
+          else: args += ["HEAD^","HEAD"]
+          out = subprocess.check_output(args).decode("utf-8","replace")
+          parts = [p for p in out.split("\x00") if p]
+
+          added_or_modified, deleted = set(), set()
+          i=0
+          while i < len(parts):
+              status = parts[i]; i+=1
+              code = status.split("\t")[0]
+              if code.startswith("R"):
+                  if i+1 <= len(parts)-1:
+                      old_path = parts[i]; new_path = parts[i+1]; i+=2
+                      def want(p): return p.startswith("public/") and p.endswith(".html")
+                      if want(new_path): added_or_modified.add(new_path)
+                      if want(old_path): deleted.add(old_path)
+                  else: break
+              else:
+                  if i <= len(parts)-1:
+                      path = parts[i]; i+=1
+                  else: break
+                  def want(p): return p.startswith("public/") and p.endswith(".html")
+                  if not want(path): continue
+                  if code.startswith(("A","M")): added_or_modified.add(path)
+                  elif code.startswith("D"): deleted.add(path)
+
+          def to_url(p):
+              rel = p[len("public/"):].replace("\\","/")
+              url = f"{BASE}/{rel}"
+              if url.endswith("/index.html"): url = url[:-len("index.html")]
+              return url
+
+          url_new_or_changed = [to_url(p) for p in sorted(added_or_modified)]
+          url_deleted = [to_url(p) for p in sorted(deleted)]
+          data = {"urlList": (url_new_or_changed + url_deleted)[:10000]}
+          with open("urls.json","w",encoding="utf-8") as f:
+              json.dump(data,f,ensure_ascii=False,indent=2)
+          print(f"new_or_changed={len(url_new_or_changed)} deleted={len(url_deleted)} total={len(data['urlList'])}")
+          PY
+        env:
+          RANGE_BEFORE: ${{ steps.range.outputs.before }}
+          RANGE_AFTER:  ${{ steps.range.outputs.after }}
+
+      - name: Skip if no incremental URLs
+        id: maybe_skip
+        run: |
+          COUNT=$(jq '.urlList | length' urls.json)
+          echo "count=$COUNT"
+          if [ "$COUNT" -eq 0 ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Wait for Cloudflare Pages to finish deployment
+        if: steps.maybe_skip.outputs.skip != 'true'
+        run: sleep 180
+
+      - name: POST to /indexnow (incremental)
+        if: steps.maybe_skip.outputs.skip != 'true'
+        run: |
+          RESP=$(curl -sS -X POST "${{ env.BASE_URL }}${{ env.INDEXNOW_ENDPOINT }}" \
+            -H "Content-Type: application/json" \
+            -H "X-IndexNow-Token: ${{ secrets.INDEXNOW_TOKEN }}" \
+            --data @urls.json)
+          echo "$RESP" | jq . || echo "$RESP"
+
+  # ---------------------------------------
+  # B) 半月一次全量：先 sitemap 再 public
+  # ---------------------------------------
+  indexnow-semi-monthly-full:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Wait for Cloudflare Pages to finish deployment
+        run: sleep 300
+
+      - name: Build urls.json (sitemap first, fallback to public/)
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os, json, urllib.request, xml.etree.ElementTree as ET
+
+          BASE = os.environ.get("BASE_URL","").rstrip("/")
+          if not BASE: raise SystemExit("BASE_URL is empty")
+
+          def from_sitemap():
+              url = f"{BASE}/sitemap.xml"
+              try:
+                  with urllib.request.urlopen(url, timeout=30) as r:
+                      if r.status != 200: return []
+                      xml = r.read()
+                  root = ET.fromstring(xml)
+                  ns = {"sm":"http://www.sitemaps.org/schemas/sitemap/0.9"}
+                  urls = [loc.text.strip() for loc in root.findall(".//sm:url/sm:loc", ns) if loc.text]
+                  if not urls:
+                      urls = [e.text.strip() for e in root.findall(".//loc") if e.text]
+                  return [u for u in urls if u.startswith(BASE)]
+              except Exception:
+                  return []
+
+          def from_public():
+              urls = set()
+              for root, _, files in os.walk("public"):
+                  for fn in files:
+                      if not fn.endswith(".html"): continue
+                      p = os.path.join(root, fn)
+                      rel = os.path.relpath(p, "public").replace("\\","/")
+                      url = f"{BASE}/{rel}"
+                      if url.endswith("/index.html"): url = url[:-len("index.html")]
+                      urls.add(url)
+              return sorted(urls)
+
+          urls = from_sitemap()
+          source = "sitemap.xml"
+          if not urls:
+              urls = from_public(); source = "public/"
+          with open("urls.json","w",encoding="utf-8") as f:
+              json.dump({"urlList": urls[:10000]}, f, ensure_ascii=False, indent=2)
+          print(f"Built urls.json with {len(urls[:10000])} URLs from {source}")
+          PY
+
+      - name: POST to /indexnow (full submit)
+        run: |
+          RESP=$(curl -sS -X POST "${{ env.BASE_URL }}${{ env.INDEXNOW_ENDPOINT }}" \
+            -H "Content-Type: application/json" \
+            -H "X-IndexNow-Token: ${{ secrets.INDEXNOW_TOKEN }}" \
+            --data @urls.json)
+          echo "$RESP" | jq . || echo "$RESP"
