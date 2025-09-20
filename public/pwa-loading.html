@@ -51,36 +51,45 @@
             border-radius: 24px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
             opacity: 0;
-            transition: opacity 600ms ease; /* 改为 600ms */
+            transition: opacity 600ms ease;
         }
         .logo.show { opacity: 1; }
 
         .title-box {
             margin-top: 16px;
-            font-weight: 700;
-            line-height: 1.2;
-            overflow: hidden;
             position: relative;
+            padding-block: 2px;
         }
-        .title-inner {
+
+        .title-stage {
+            position: relative;
             display: grid;
-            gap: 0;
-            transform: translateY(0);
-            transition: transform 900ms ease;
-            will-change: transform;
-            opacity: 0;
-            transition-property: opacity, transform;
-            transition-duration: 900ms, 900ms;
-            transition-timing-function: ease, ease;
+            place-items: center;
+            min-height: 1em;
         }
-        .title-inner.show { opacity: 1; }
-        .title-inner.scroll { transform: translateY(-50%); }
 
         .line {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
             margin: 0;
-            white-space: normal;
-            word-break: break-word;
+            font-weight: 700;
+            line-height: 1.2;
             font-size: clamp(18px, 5vw, 20px);
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 900ms ease, transform 900ms ease;
+            will-change: opacity, transform;
+            pointer-events: none;
+        }
+        .line.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .line.hide {
+            opacity: 0;
+            transform: translateY(-6px);
         }
 
         .error-message {
@@ -100,8 +109,8 @@
             id="logo"
         />
 
-        <div class="title-box" id="titleBox" aria-live="polite">
-            <div class="title-inner" id="titleInner">
+        <div class="title-box" aria-live="polite">
+            <div class="title-stage" id="titleStage">
                 <h1 class="line" id="line1">Minecraft Share</h1>
                 <h1 class="line" id="line2">Welcome to MC Share !</h1>
             </div>
@@ -112,47 +121,27 @@
         </div>
     </div>
 
-    <!-- 公共 SW 注册脚本 -->
     <script src="/javascript/register-sw.js" defer></script>
 
     <script>
-        function setTitleBoxHeight() {
-            const box = document.getElementById('titleBox');
-            const l1  = document.getElementById('line1');
-            const l2  = document.getElementById('line2');
-            if (!box || !l1 || !l2) return;
-            const h = Math.max(
-                Math.ceil(l1.getBoundingClientRect().height),
-                Math.ceil(l2.getBoundingClientRect().height)
-            );
-            box.style.height = h + 'px';
-        }
-
         window.addEventListener('load', () => {
             const logo  = document.getElementById('logo');
-            const inner = document.getElementById('titleInner');
+            const l1    = document.getElementById('line1');
+            const l2    = document.getElementById('line2');
 
-            setTitleBoxHeight();
-            if (document.fonts && document.fonts.ready) {
-                document.fonts.ready.then(setTitleBoxHeight);
-            }
-            window.addEventListener('resize', setTitleBoxHeight);
-
-            // —— 动画：先显示 logo，再标题，再滚动 —— //
+            // —— logo 和第一行同步淡入 —— //
             requestAnimationFrame(() => {
-                // 强制一次回流，确保初始 opacity=0 应用
                 void logo.offsetWidth;
                 requestAnimationFrame(() => {
-                    logo.classList.add('show'); // 触发 600ms 淡入
+                    logo.classList.add('show');
+                    l1.classList.add('show');  // 同时显示第一行
 
-                    // 等 logo 完全淡入(600ms)再显示标题
+                    // —— 第一行停留 1 秒后切换到第二行 —— //
                     setTimeout(() => {
-                        inner.classList.add('show');
-                        // 第一行停留 1 秒
-                        setTimeout(() => {
-                            inner.classList.add('scroll');
-                        }, 1000);
-                    }, 600);
+                        l2.classList.add('show');
+                        l1.classList.remove('show');
+                        l1.classList.add('hide');
+                    }, 1500);
                 });
             });
         });

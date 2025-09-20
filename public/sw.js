@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pwa-cache-v10';
+const CACHE_NAME = 'pwa-cache-v11';
 const urlsToCache = [
   '/pwa-loading', // 只缓存启动页
 ];

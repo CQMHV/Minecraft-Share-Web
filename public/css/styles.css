@@ -5,6 +5,11 @@
     /* 去掉移动端的点击高亮（iOS/Android） */
     -webkit-tap-highlight-color: transparent;
 }
+/* 清除a的下划线和点击色 */
+a{
+    text-decoration: none;
+    color:unset;
+}
 /* 鼠标悬停时显示手形光标 */
 .clickable {
     cursor: pointer;
@@ -64,11 +69,6 @@ p {
         font-size: 1.5rem;
         margin-bottom: 10px;
     }
-}
-/* 清除a的下划线和点击色 */
-a{
-    text-decoration: none;
-    color:unset;
 }
 /* 隐藏h1,h2 */
 h1,h2{
