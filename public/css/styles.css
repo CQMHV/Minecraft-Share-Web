@@ -290,6 +290,7 @@ footer p{
 .social-btn img {
     width: 24px;
     height: 24px;
+    object-fit: contain;
     margin-bottom: 6px;
     transition: transform 0.3s;
 }
@@ -310,6 +311,7 @@ footer p{
 .social-btn.twitch  { background-color: #9146FF; }
 .social-btn.discord { background-color: #5865F2; }
 .social-btn.reddit  { background-color: #FF4500; }
+.social-btn.bilibili{ background-color: #FA7299; }
 .social-btn.website { background-color: #007ACC; }
 
 /* 悬浮效果 */
@@ -321,11 +323,7 @@ footer p{
 }
 
 /* 单独为Billbill图标适配 */
-.social-btn.bilibili {
-    background-color: #FA7299;
-}
 .social-btn.bilibili img {
-    width: 28px;
-    height: 28px;
-    object-fit: contain;
+    width: 26px;
+    height: 26px;
 }

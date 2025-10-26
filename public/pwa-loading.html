@@ -1,22 +1,24 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <title>Minecraft Share - Launching</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+<head>
+    <meta charset="UTF-8">
+    <title>Minecraft Share - Launching</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,follow">
     <!-- Manifest -->
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="/manifest.json">
 
     <!-- 主题色 -->
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0b0f0c" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1f1f1f" media="(prefers-color-scheme: dark)">
 
     <style>
         :root {
             --bg: #ffffff;
             --fg: #1f1f1f;
         }
+
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg: #0b0f0c;
@@ -24,13 +26,15 @@
             }
         }
 
-        html, body {
+        html,
+        body {
             height: 100%;
             margin: 0;
             background: var(--bg);
             color: var(--fg);
             font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", Arial, sans-serif;
         }
+
         body {
             display: grid;
             place-items: center;
@@ -53,7 +57,10 @@
             opacity: 0;
             transition: opacity 600ms ease;
         }
-        .logo.show { opacity: 1; }
+
+        .logo.show {
+            opacity: 1;
+        }
 
         .title-box {
             margin-top: 16px;
@@ -83,10 +90,12 @@
             will-change: opacity, transform;
             pointer-events: none;
         }
+
         .line.show {
             opacity: 1;
             transform: translateY(0);
         }
+
         .line.hide {
             opacity: 0;
             transform: translateY(-6px);
@@ -100,14 +109,10 @@
         }
     </style>
 </head>
+
 <body>
     <div class="wrap">
-        <img
-            src="/images/Homepage_Gameplay-Trailer_MC-OV-logo_300x300.png"
-            alt="App logo"
-            class="logo"
-            id="logo"
-        />
+        <img src="/images/Homepage_Gameplay-Trailer_MC-OV-logo_300x300.png" alt="App logo" class="logo" id="logo">
 
         <div class="title-box" aria-live="polite">
             <div class="title-stage" id="titleStage">
@@ -125,9 +130,9 @@
 
     <script>
         window.addEventListener('load', () => {
-            const logo  = document.getElementById('logo');
-            const l1    = document.getElementById('line1');
-            const l2    = document.getElementById('line2');
+            const logo = document.getElementById('logo');
+            const l1 = document.getElementById('line1');
+            const l2 = document.getElementById('line2');
 
             // —— logo 和第一行同步淡入 —— //
             requestAnimationFrame(() => {
@@ -160,7 +165,7 @@
                         if (!timeoutTriggered) {
                             location.replace('/');
                         }
-                    }, 3000);
+                    }, 2800);
                 }).catch((err) => {
                     console.error('Service Worker 注册失败:', err);
                     document.getElementById('error-message').style.display = 'block';
@@ -171,4 +176,5 @@
         });
     </script>
 </body>
+
 </html>

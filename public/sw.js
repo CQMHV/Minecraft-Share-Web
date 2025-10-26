@@ -1,65 +1,76 @@
-const CACHE_NAME = 'pwa-cache-v11';
-const urlsToCache = [
-  '/pwa-loading', // 只缓存启动页
-];
+const CACHE_NAME = 'pwa-cache-v3';
+const STARTUP_URL = '/pwa-loading';
 
-// 安装 Service Worker 时缓存启动页
+// 安装阶段：仅缓存启动页（强制绕过浏览器 HTTP 缓存）
+// 如果资源请求失败（例如断网/404），不会阻止 SW 安装成功
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache and caching the PWA loading page');
-        return cache.addAll(urlsToCache);  // 仅缓存 `/pwa-loading`
-      })
-  );
-});
-
-// 激活 Service Worker，清理旧缓存
-self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (!cacheWhitelist.includes(cacheName)) {
-            return caches.delete(cacheName); // 删除不再使用的旧缓存
-          }
-        })
-      );
-    })
-  );
-});
-
-// 拦截网络请求并返回缓存的启动页
-self.addEventListener('fetch', event => {
-  if (event.request.url.includes('/pwa-loading')) {  // 只拦截 pwa-loading 页面请求
-    event.respondWith((async () => {
-      const cachedResponse = await caches.match(event.request);
-      // 如果缓存中有该页面，返回缓存的资源
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-
-      const response = await fetch(event.request);
-      // 检查响应是否有效
-      if (!response || response.status !== 200 || response.type !== 'basic') {
-        return response;
-      }
-
-      // 克隆响应以便缓存
-      const responseToCache = response.clone();
-
-      // 将响应缓存起来并确保写入完成
-      event.waitUntil((async () => {
+    event.waitUntil((async () => {
         try {
-          const cache = await caches.open(CACHE_NAME);
-          await cache.put(event.request, responseToCache);
-        } catch (error) {
-          console.error('Failed to cache the response:', error);
+            const cache = await caches.open(CACHE_NAME);
+            await cache.add(new Request(STARTUP_URL, { cache: 'reload' }));
+        } catch (e) {
+            console.warn('Precache failed:', e);
         }
-      })());
-
-      return response;
+        // 跳过等待阶段，立即进入 activate
+        self.skipWaiting();
     })());
-  }
+});
+
+// 激活阶段：清理旧版本缓存，并启用导航预加载（若浏览器支持）
+// navigationPreload 可以让 fetch 在 SW 启动时并行请求资源，加快弱网加载
+self.addEventListener('activate', event => {
+    event.waitUntil((async () => {
+        // 删除不在白名单中的缓存
+        const names = await caches.keys();
+        await Promise.all(names.map(n => (n === CACHE_NAME ? Promise.resolve() : caches.delete(n))));
+
+        // 开启导航预加载（可选优化）
+        if ('navigationPreload' in self.registration) {
+            try { await self.registration.navigationPreload.enable(); } catch {}
+        }
+
+        // 立即接管所有客户端
+        await self.clients.claim();
+    })());
+});
+
+// 请求拦截：只处理启动页的请求
+// 策略为“缓存优先”：
+//   1. 先从缓存返回（ignoreSearch 确保带查询参数也能命中）
+//   2. 否则尝试使用 navigation preload 的响应
+//   3. 再次失败则走网络请求并更新缓存
+//   4. 若离线且无缓存，则返回一个 503 响应
+self.addEventListener('fetch', event => {
+    const req = event.request;
+    if (req.method !== 'GET') return;
+
+    const url = new URL(req.url);
+    if (!(url.origin === self.location.origin && url.pathname === STARTUP_URL)) return;
+
+    event.respondWith((async () => {
+        // 优先返回缓存
+        const cached = await caches.match(req, { ignoreSearch: true });
+        if (cached) return cached;
+
+        // 其次尝试 navigation preload 的响应
+        const preloaded = 'preloadResponse' in event ? await event.preloadResponse : null;
+        if (preloaded) {
+            const cache = await caches.open(CACHE_NAME);
+            cache.put(req, preloaded.clone());
+            return preloaded;
+        }
+
+        // 再尝试网络请求
+        try {
+            const net = await fetch(req);
+            if (net && net.ok) {
+                const cache = await caches.open(CACHE_NAME);
+                cache.put(req, net.clone());
+            }
+            return net;
+        } catch {
+            // 离线兜底
+            return new Response('Offline', { status: 503 });
+        }
+    })());
 });
